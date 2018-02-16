@@ -2,14 +2,20 @@ const logger = require('logger');
 const Router = require('koa-router');
 const neo4jService = require('services/neo4j.service');
 const datasetService = require('services/dataset.service');
-const qs = require('qs');
-
 
 const router = new Router({
   prefix: '/graph',
 });
 
 class GraphRouter {
+
+  static getUser(ctx) {
+    return JSON.parse(ctx.headers.user_key) ? JSON.parse(ctx.headers.user_key) : { id: null };
+  }
+
+  static getApplication(ctx) {
+    return JSON.parse(ctx.headers.app_key).application;
+  }
 
   static async createDataset(ctx) {
     logger.info('Creating dataset node with id ', ctx.params.id);
@@ -19,7 +25,8 @@ class GraphRouter {
   static async associateResource(ctx) {
     ctx.assert(ctx.request.body && ctx.request.body.tags && ctx.request.body.tags.length > 0, 400, 'Tags body param is required');
     logger.info('Associating ', ctx.params.resourceType, ' node with id ', ctx.params.idResource, 'and tags ', ctx.request.body.tags);
-    ctx.body = await neo4jService.createRelationWithConcepts(ctx.params.resourceType, ctx.params.idResource, ctx.request.body.tags, ctx.request.body.application || 'rw');
+    const application = GraphRouter.getApplication(ctx);
+    ctx.body = await neo4jService.createRelationWithConcepts(ctx.params.resourceType, ctx.params.idResource, ctx.request.body.tags, application);
   }
 
   static async createWidgetNodeAndRelation(ctx) {
@@ -35,7 +42,7 @@ class GraphRouter {
   static async createMetadataNodeAndRelation(ctx) {
     ctx.assert(['DATASET', 'LAYER', 'WIDGET'].indexOf(ctx.params.resourceType) >= 0, 400, `Resource ${ctx.params.resourceType} invalid`);
     logger.info('Creating metadata node and relation with idWidget ', ctx.params.idMetadata, ' and resourcetype ', ctx.params.resourceType, ' and idresource', ctx.params.idResource);
-    ctx.body = await neo4jService.createMetadataNodeAndRelation(ctx.params.resourceType, ctx.params.idResource, ctx.params.idMetadata, );
+    ctx.body = await neo4jService.createMetadataNodeAndRelation(ctx.params.resourceType, ctx.params.idResource, ctx.params.idMetadata);
   }
 
   static async deleteDataset(ctx) {
@@ -60,17 +67,19 @@ class GraphRouter {
 
   static async createFavouriteRelationWithResource(ctx) {
     logger.info('Creating favourite relation ');
-    ctx.body = await neo4jService.createFavouriteRelationWithResource(ctx.params.userId, ctx.params.resourceType, ctx.params.idResource, ctx.request.body.application || 'rw');
+    const application = GraphRouter.getApplication(ctx);
+    ctx.body = await neo4jService.createFavouriteRelationWithResource(ctx.params.userId, ctx.params.resourceType, ctx.params.idResource, application);
   }
 
   static async deleteFavouriteRelationWithResource(ctx) {
     logger.info('Creating favourite relation ');
-    ctx.body = await neo4jService.deleteFavouriteRelationWithResource(ctx.params.userId, ctx.params.resourceType, ctx.params.idResource, ctx.request.query.application || 'rw');
+    const application = GraphRouter.getApplication(ctx);
+    ctx.body = await neo4jService.deleteFavouriteRelationWithResource(ctx.params.userId, ctx.params.resourceType, ctx.params.idResource, application);
   }
 
   static async mostLikedDatasets(ctx) {
     logger.info('Getting most liked datasets ');
-    const application = ctx.query.application || ctx.query.app || 'rw';
+    const application = GraphRouter.getApplication(ctx);
     const response = await neo4jService.mostLikedDatasets(application);
     let data = [];
     if (response) {
@@ -88,7 +97,7 @@ class GraphRouter {
 
   static async conceptsInferred(ctx) {
     let concepts = null;
-    const application = ctx.query.application || ctx.query.app || 'rw';
+    const application = GraphRouter.getApplication(ctx);
     if (ctx.query.concepts) {
       concepts = ctx.query.concepts.split(',').map(c => c.trim());
     } else if (ctx.request.body) {
@@ -116,7 +125,7 @@ class GraphRouter {
 
   static async conceptsAncestors(ctx) {
     let concepts = null;
-    const application = ctx.query.application || ctx.query.app || 'rw';
+    const application = GraphRouter.getApplication(ctx);
     if (ctx.query.concepts) {
       concepts = ctx.query.concepts.split(',').map(c => c.trim());
     } else if (ctx.request.body) {
@@ -144,7 +153,7 @@ class GraphRouter {
 
   static async listConcepts(ctx) {
     logger.info('Getting list concepts ');
-    const application = ctx.query.application || ctx.query.app || 'rw';
+    const application = GraphRouter.getApplication(ctx);
     const response = await neo4jService.getListConcepts(application);
     let data = [];
     if (response.records) {
@@ -166,7 +175,7 @@ class GraphRouter {
 
   static async querySearchDatasets(ctx) {
     let concepts = null;
-    const application = ctx.query.application || ctx.query.app || 'rw';
+    const application = GraphRouter.getApplication(ctx);
     if (ctx.method === 'GET') {
       ctx.assert(ctx.query.concepts, 400, 'Concepts query params is required');
       concepts = ctx.query.concepts;
@@ -185,7 +194,7 @@ class GraphRouter {
     }) : [];
     let result = [];
     if (datasetIds.length > 0) {
-      result = await datasetService.checkDatasets(datasetIds, ctx.query);
+      result = await datasetService.checkDatasets(application, datasetIds, ctx.query);
     } else {
       result = [];
     }
@@ -196,7 +205,7 @@ class GraphRouter {
 
   static async queryMostViewed(ctx) {
     logger.info('Returning datasets most viewed');
-    const application = ctx.query.application || ctx.query.app || 'rw';
+    const application = GraphRouter.getApplication(ctx);
     const results = await neo4jService.queryMostViewed(application);
     const datasetIds = [];
     const data = results.records ? results.records.map(el => {
@@ -208,7 +217,7 @@ class GraphRouter {
     }) : [];
     let result = [];
     if (datasetIds.length > 0) {
-      result = await datasetService.checkDatasets(datasetIds, ctx.query);
+      result = await datasetService.checkDatasets(application, datasetIds, ctx.query);
     } else {
       result = [];
     }
@@ -223,12 +232,12 @@ class GraphRouter {
 
   static async queryMostViewedByUser(ctx) {
     logger.info('Returning datasets most viewed by user');
-    if (!ctx.query.loggedUser) {
+    const user = GraphRouter.getUser(ctx);
+    if (!user) {
       ctx.throw(401, 'Not authenticaed');
       return;
     }
-    const user = JSON.parse(ctx.query.loggedUser);
-    const application = ctx.query.application || ctx.query.app || 'rw';
+    const application = GraphRouter.getApplication(ctx);
     const results = await neo4jService.queryMostViewedByUser(user.id, application);
 
     const datasetIds = [];
@@ -241,7 +250,7 @@ class GraphRouter {
     }) : [];
     let result = [];
     if (datasetIds.length > 0) {
-      result = await datasetService.checkDatasets(datasetIds, ctx.query);
+      result = await datasetService.checkDatasets(application, datasetIds, ctx.query);
     } else {
       result = [];
     }
@@ -256,7 +265,7 @@ class GraphRouter {
 
   static async querySimilarDatasets(ctx) {
     logger.info('Obtaining similar datasets', ctx.params.dataset);
-    const application = ctx.query.application || ctx.query.app || 'rw';
+    const application = GraphRouter.getApplication(ctx);
     if (ctx.params.dataset) {
       ctx.query.dataset = ctx.params.dataset;
     }
@@ -273,7 +282,7 @@ class GraphRouter {
     }) : [];
     let result = [];
     if (datasetIds.length > 0) {
-      result = await datasetService.checkDatasets(datasetIds, ctx.query);
+      result = await datasetService.checkDatasets(application, datasetIds, ctx.query);
     }
     ctx.body = {
       data: data.filter((el) => result.indexOf(el.dataset) >= 0).slice(0, ctx.query.limit || 3)
@@ -282,7 +291,7 @@ class GraphRouter {
 
   static async querySimilarDatasetsIncludingDescendent(ctx) {
     logger.info('Obtaining similar datasets with descendent', ctx.params.dataset);
-    const application = ctx.query.application || ctx.query.app || 'rw';
+    const application = GraphRouter.getApplication(ctx);
     if (ctx.params.dataset) {
       ctx.query.dataset = ctx.params.dataset;
     }
@@ -299,7 +308,7 @@ class GraphRouter {
     }) : [];
     let result = [];
     if (datasetIds.length > 0) {
-      result = await datasetService.checkDatasets(datasetIds, ctx.query);
+      result = await datasetService.checkDatasets(application, datasetIds, ctx.query);
     }
     ctx.body = {
       data: data.filter((el) => result.indexOf(el.dataset) >= 0).slice(0, ctx.query.limit || 3)
@@ -308,7 +317,7 @@ class GraphRouter {
 
   static async visitedDataset(ctx) {
     logger.info('Visited dataset');
-    const user = ctx.request.body && ctx.request.body.loggedUser;
+    const user = GraphRouter.getUser(ctx);
     await neo4jService.visitedDataset(ctx.params.id, user ? user.id : null);
     ctx.body = {};
   }
@@ -316,10 +325,7 @@ class GraphRouter {
 }
 
 async function isAuthorized(ctx, next) {
-  let user = ctx.request.body && ctx.request.body.loggedUser;
-  if (!user && ctx.request.query && ctx.request.query.loggedUser) {
-    user = JSON.parse(ctx.request.query.loggedUser);
-  }
+  const user = GraphRouter.getUser(ctx);
 
   if (!user || user.id !== 'microservice') {
     ctx.throw(403, 'Not authorized');

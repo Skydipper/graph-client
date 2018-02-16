@@ -3,7 +3,7 @@ const ctRegisterMicroservice = require('ct-register-microservice-node');
 
 class DatasetService {
 
-  static async checkDatasets(datasets, query) {
+  static async checkDatasets(application, datasets, query) {
     logger.info('Checking published and other fields of dataset', datasets);
     if (query) {
       delete query.loggedUser;
@@ -12,6 +12,7 @@ class DatasetService {
       uri: '/dataset/find-by-ids',
       method: 'POST',
       json: true,
+      application,
       body: {
         ids: datasets
       },
@@ -22,7 +23,6 @@ class DatasetService {
       return result.data.map(el => el.id);
     }
     return [];
-    
   }
 
 }

@@ -5,6 +5,7 @@
 	"endpoints": [{
 		"path": "/v1/graph/query",
 		"method": "GET",
+		"applicationRequired": true,
 		"redirect": {
 			"method": "GET",
 			"path": "/api/v1/graph/query"
@@ -13,6 +14,7 @@
 		"path": "/v1/graph/dataset/:idDataset",
 		"method": "POST",
 		"authenticated": true,
+		"applicationRequired": true,
 		"redirect": {
 			"method": "POST",
 			"path": "/api/v1/graph/dataset/:idDataset"
@@ -20,6 +22,7 @@
 	}, {
 		"path": "/v1/graph/dataset/:idDataset/visited",
 		"method": "POST",
+		"applicationRequired": true,
 		"redirect": {
 			"method": "POST",
 			"path": "/api/v1/graph/dataset/:idDataset/visited"
@@ -28,6 +31,7 @@
 		"path": "/v1/graph/widget/:idDataset/:idWidget",
 		"method": "POST",
 		"authenticated": true,
+		"applicationRequired": true,
 		"redirect": {
 			"method": "POST",
 			"path": "/api/v1/graph/widget/:idDataset/:idWidget"
@@ -36,6 +40,7 @@
 		"path": "/v1/graph/layer/:idDataset/:idLayer",
 		"method": "POST",
 		"authenticated": true,
+		"applicationRequired": true,
 		"redirect": {
 			"method": "POST",
 			"path": "/api/v1/graph/layer/:idDataset/:idLayer"
@@ -44,6 +49,7 @@
 		"path": "/v1/graph/metadata/:resourceType/:idResource/:idMetadata",
 		"method": "POST",
 		"authenticated": true,
+		"applicationRequired": true,
 		"redirect": {
 			"method": "POST",
 			"path": "/api/v1/graph/metadata/:resourceType/:idResource/:idMetadata"
@@ -52,6 +58,7 @@
 		"path": "/v1/graph/favourite/:resourceType/:idResource/:userId",
 		"method": "POST",
 		"authenticated": true,
+		"applicationRequired": true,
 		"redirect": {
 			"method": "POST",
 			"path": "/api/v1/graph/favourite/:resourceType/:idResource/:userId"
@@ -60,6 +67,7 @@
 		"path": "/v1/graph/:resource/:id/associate",
 		"method": "POST",
 		"authenticated": true,
+		"applicationRequired": true,
 		"redirect": {
 			"method": "POST",
 			"path": "/api/v1/graph/:resource/:id/associate"
@@ -68,6 +76,7 @@
 		"path": "/v1/graph/dataset/:id",
 		"method": "DELETE",
 		"authenticated": true,
+		"applicationRequired": true,
 		"redirect": {
 			"method": "DELETE",
 			"path": "/api/v1/graph/dataset/:id"
@@ -76,6 +85,7 @@
 		"path": "/v1/graph/widget/:id",
 		"method": "DELETE",
 		"authenticated": true,
+		"applicationRequired": true,
 		"redirect": {
 			"method": "DELETE",
 			"path": "/api/v1/graph/widget/:id"
@@ -84,6 +94,7 @@
 		"path": "/v1/graph/layer/:id",
 		"method": "DELETE",
 		"authenticated": true,
+		"applicationRequired": true,
 		"redirect": {
 			"method": "DELETE",
 			"path": "/api/v1/graph/layer/:id"
@@ -92,6 +103,7 @@
 		"path": "/v1/graph/metadata/:id",
 		"method": "DELETE",
 		"authenticated": true,
+		"applicationRequired": true,
 		"redirect": {
 			"method": "DELETE",
 			"path": "/api/v1/graph/metadata/:id"
@@ -100,6 +112,7 @@
 		"path": "/v1/graph/favourite/:resourceType/:idResource/:userId",
 		"method": "DELETE",
 		"authenticated": true,
+		"applicationRequired": true,
 		"redirect": {
 			"method": "DELETE",
 			"path": "/api/v1/graph/favourite/:resourceType/:idResource/:userId"
@@ -107,6 +120,7 @@
 	}, {
 		"path": "/v1/graph/query/similar-dataset",
 		"method": "GET",
+		"applicationRequired": true,
 		"redirect": {
 			"method": "GET",
 			"path": "/api/v1/graph/query/similar-dataset"
@@ -114,6 +128,7 @@
 	}, {
 		"path": "/v1/graph/query/similar-dataset/:dataset",
 		"method": "GET",
+		"applicationRequired": true,
 		"redirect": {
 			"method": "GET",
 			"path": "/api/v1/graph/query/similar-dataset/:dataset"
@@ -121,6 +136,7 @@
 	}, {
 		"path": "/v1/graph/query/list-concepts",
 		"method": "GET",
+		"applicationRequired": true,
 		"redirect": {
 			"method": "GET",
 			"path": "/api/v1/graph/query/list-concepts"
@@ -128,6 +144,7 @@
 	}, {
 		"path": "/v1/graph/query/concepts-inferred",
 		"method": "GET",
+		"applicationRequired": true,
 		"redirect": {
 			"method": "GET",
 			"path": "/api/v1/graph/query/concepts-inferred"
@@ -135,6 +152,7 @@
 	}, {
 		"path": "/v1/graph/query/concepts-inferred",
 		"method": "POST",
+		"applicationRequired": true,
 		"redirect": {
 			"method": "POST",
 			"path": "/api/v1/graph/query/concepts-inferred"
@@ -142,6 +160,7 @@
 	}, {
 		"path": "/v1/graph/query/concepts-ancestors",
 		"method": "GET",
+		"applicationRequired": true,
 		"redirect": {
 			"method": "GET",
 			"path": "/api/v1/graph/query/concepts-ancestors"
@@ -149,6 +168,7 @@
 	}, {
 		"path": "/v1/graph/query/concepts-ancestors",
 		"method": "POST",
+		"applicationRequired": true,
 		"redirect": {
 			"method": "POST",
 			"path": "/api/v1/graph/query/concepts-ancestors"
@@ -156,6 +176,7 @@
 	}, {
 		"path": "/v1/graph/query/similar-dataset-including-descendent",
 		"method": "GET",
+		"applicationRequired": true,
 		"redirect": {
 			"method": "GET",
 			"path": "/api/v1/graph/query/similar-dataset-including-descendent"
@@ -163,6 +184,7 @@
 	}, {
 		"path": "/v1/graph/query/similar-dataset-including-descendent/:dataset",
 		"method": "GET",
+		"applicationRequired": true,
 		"redirect": {
 			"method": "GET",
 			"path": "/api/v1/graph/query/similar-dataset-including-descendent/:dataset"
@@ -170,6 +192,7 @@
 	}, {
 		"path": "/v1/graph/query/search-datasets",
 		"method": "GET",
+		"applicationRequired": true,
 		"redirect": {
 			"method": "GET",
 			"path": "/api/v1/graph/query/search-datasets"
@@ -177,6 +200,7 @@
 	}, {
 		"path": "/v1/graph/query/most-liked-datasets",
 		"method": "GET",
+		"applicationRequired": true,
 		"redirect": {
 			"method": "GET",
 			"path": "/api/v1/graph/query/most-liked-datasets"
@@ -184,6 +208,7 @@
 	}, {
 		"path": "/v1/graph/query/search-datasets",
 		"method": "POST",
+		"applicationRequired": true,
 		"redirect": {
 			"method": "POST",
 			"path": "/api/v1/graph/query/search-datasets"
@@ -191,6 +216,7 @@
 	}, {
 		"path": "/v1/graph/query/most-viewed",
 		"method": "GET",
+		"applicationRequired": true,
 		"redirect": {
 			"method": "GET",
 			"path": "/api/v1/graph/query/most-viewed"
@@ -199,6 +225,7 @@
 		"path": "/v1/graph/query/most-viewed-by-user",
 		"method": "GET",
 		"authenticated": true,
+		"applicationRequired": true,
 		"redirect": {
 			"method": "GET",
 			"path": "/api/v1/graph/query/most-viewed-by-user"

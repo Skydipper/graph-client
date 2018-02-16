@@ -88,7 +88,7 @@ RETURN dataset, dataset_tags, number_of_ocurrences
 ORDER BY number_of_ocurrences DESC
 `;
 
-const QUERY_SEARCH_PARTS= [`
+const QUERY_SEARCH_PARTS = [`
 MATCH (c:CONCEPT)<-[:TAGGED_WITH {application: {application}}]-(d:DATASET)
 WHERE c.id IN {concepts1}
 WITH COLLECT(d.id) AS datasets
@@ -397,7 +397,7 @@ class Neo4JService {
       for (let i = 0, length = concepts.length; i < length; i++) {
         query += QUERY_SEARCH_PARTS[i];
 
-        params[`concepts${i+1}`] = concepts[i]; //.map(el => `'${el}'`).join(',');
+        params[`concepts${i + 1}`] = concepts[i]; // .map(el => `'${el}'`).join(',');
       }
       query += QUERY_SEARCH_FINAL;
     }
