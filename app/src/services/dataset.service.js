@@ -9,7 +9,7 @@ class DatasetService {
             delete query.loggedUser;
         }
         const result = await RWAPIMicroservice.requestToMicroservice({
-            uri: '/dataset/find-by-ids',
+            uri: '/v1/dataset/find-by-ids',
             method: 'POST',
             json: true,
             body: {

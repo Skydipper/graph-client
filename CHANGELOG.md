@@ -1,3 +1,7 @@
+## 31/07/2021
+
+- Update `rw-api-microservice-node` to remove CT integration support.
+
 ## 31/05/2021
 
 - Update `rw-api-microservice-node` to add CORS support.
