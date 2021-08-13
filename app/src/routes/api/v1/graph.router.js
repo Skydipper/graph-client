@@ -378,11 +378,9 @@ class GraphRouter {
     static async querySimilarDatasets(ctx) {
         logger.info('Obtaining similar datasets', ctx.params.dataset);
         const application = ctx.query.application || ctx.query.app || 'rw';
-        if (ctx.params.dataset) {
-            ctx.query.dataset = ctx.params.dataset;
-        }
-        ctx.assert(ctx.query.dataset, 400, 'dataset query param required');
-        const results = await QueryService.querySimilarDatasets(ctx.query.dataset.split(','), application);
+        const dataset = ctx.params.dataset || ctx.query.dataset || false;
+        ctx.assert(dataset, 400, 'dataset query param required');
+        const results = await QueryService.querySimilarDatasets(dataset.split(','), application);
         const datasetIds = [];
         const data = results && results.records ? results.records.map((el) => {
             datasetIds.push(el._fields[0]);
