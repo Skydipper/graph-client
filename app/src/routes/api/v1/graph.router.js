@@ -96,15 +96,25 @@ class GraphRouter {
         const application = ctx.query.application || ctx.query.app || 'rw';
         const response = await QueryService.mostLikedDatasets(application);
         let data = [];
+        const datasetIds = [];
         if (response) {
-            data = response.records.map((c) => ({
-                id: c._fields[0],
-                count: c._fields[1]
-            }));
+            data = response.records.map((c) => {
+                datasetIds.push(c._fields[0]);
+                return {
+                    id: c._fields[0],
+                    count: c._fields[1]
+                };
+            });
         }
+
+        let result = [];
+        if (datasetIds.length > 0) {
+            result = await datasetService.checkDatasets(datasetIds, ctx.query);
+        }
+
         ctx.set('cache', 'graph-dataset');
         ctx.body = {
-            data
+            data: data.filter((el) => result.indexOf(el.dataset) >= 0)
         };
     }
 
@@ -310,9 +320,15 @@ class GraphRouter {
         } else if (!datasetIds) {
             datasetIds = await QueryService.sortDatasets(sort, datasetIds);
         }
+
+        let result = [];
+        if (datasetIds.length > 0) {
+            result = await datasetService.checkDatasets(datasetIds, ctx.query);
+        }
+
         ctx.set('cache', 'graph-dataset');
         ctx.body = {
-            data: datasetIds
+            data: datasetIds.filter((datasetId) => result.indexOf(datasetId) >= 0)
         };
     }
 
@@ -431,7 +447,7 @@ class GraphRouter {
 
         ctx.assert(ctx.query.search, 400, 'search query param required');
         const results = await QueryService.querySearchByLabelSynonymons(ctx.query.search ? ctx.query.search.split(' ') : '', application);
-        logger.debug('AAA', results);
+
         const datasetIds = [];
         if (results && results.records) {
             results.records.map((el) => {
@@ -443,9 +459,14 @@ class GraphRouter {
                 };
             });
         }
+
+        let result = [];
+        if (datasetIds.length > 0) {
+            result = await datasetService.checkDatasets(datasetIds, ctx.query);
+        }
         ctx.set('cache', 'graph-default');
         ctx.body = {
-            data: datasetIds
+            data: datasetIds.filter((datasetId) => result.indexOf(datasetId) >= 0)
         };
     }
 
